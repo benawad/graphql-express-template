@@ -4,10 +4,12 @@ import { graphiqlExpress, graphqlExpress } from 'graphql-server-express';
 import { makeExecutableSchema } from 'graphql-tools';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
+import { invert } from 'lodash';
 
 import typeDefs from './schema';
 import resolvers from './resolvers';
 import models from './models';
+import queryMap from './extractedQueries';
 
 const schema = makeExecutableSchema({
   typeDefs,
@@ -38,6 +40,21 @@ app.use(
     endpointURL: '/graphql',
   }),
 );
+
+const invertedQueryMap = invert(queryMap);
+app.use('/graphql', (req) => {
+  if (req.body && req.body.id) {
+    const query = invertedQueryMap[req.body.id];
+    if (query) {
+      req.body.query = query;
+    } else {
+      throw new Error('NOT ALLOWED');
+    }
+  } else {
+    throw new Error('NOT ALLOWED');
+  }
+  req.next();
+});
 
 app.use(
   '/graphql',
