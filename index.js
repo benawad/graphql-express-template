@@ -42,7 +42,7 @@ app.use(
 );
 
 const invertedQueryMap = invert(queryMap);
-app.use('/graphql', (req) => {
+app.use('/graphql', bodyParser.json(), (req) => {
   if (req.body && req.body.id) {
     const query = invertedQueryMap[req.body.id];
     if (query) {
@@ -58,7 +58,6 @@ app.use('/graphql', (req) => {
 
 app.use(
   '/graphql',
-  bodyParser.json(),
   graphqlExpress(req => ({
     schema,
     context: {
