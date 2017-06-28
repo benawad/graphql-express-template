@@ -4,6 +4,9 @@ import { graphiqlExpress, graphqlExpress } from 'graphql-server-express';
 import { makeExecutableSchema } from 'graphql-tools';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
+import { createServer } from 'http';
+import { execute, subscribe } from 'graphql';
+import { SubscriptionServer } from 'subscriptions-transport-ws';
 
 import typeDefs from './schema';
 import resolvers from './resolvers';
@@ -52,4 +55,20 @@ app.use(
   })),
 );
 
-models.sequelize.sync().then(() => app.listen(3000));
+const server = createServer(app);
+
+models.sequelize.sync().then(() =>
+  server.listen(3000, () => {
+    new SubscriptionServer(
+      {
+        execute,
+        subscribe,
+        schema,
+      },
+      {
+        server,
+        path: '/subscriptions',
+      },
+    );
+  }),
+);

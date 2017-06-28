@@ -1,8 +1,18 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
+import { PubSub } from 'graphql-subscriptions';
+
+export const pubsub = new PubSub();
+
+const USER_ADDED = 'USER_ADDED';
 
 export default {
+  Subscription: {
+    userAdded: {
+      subscribe: () => pubsub.asyncIterator(USER_ADDED),
+    },
+  },
   User: {
     boards: ({ id }, args, { models }) =>
       models.Board.findAll({
@@ -69,6 +79,15 @@ export default {
     createBoard: (parent, args, { models }) => models.Board.create(args),
     createSuggestion: (parent, args, { models }) =>
       models.Suggestion.create(args),
+    createUser: async (parent, args, { models }) => {
+      const user = args;
+      user.password = 'idk';
+      const userAdded = await models.User.create(user);
+      pubsub.publish(USER_ADDED, {
+        userAdded,
+      });
+      return userAdded;
+    },
     register: async (parent, args, { models }) => {
       const user = args;
       user.password = await bcrypt.hash(user.password, 12);
