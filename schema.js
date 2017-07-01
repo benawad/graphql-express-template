@@ -36,7 +36,7 @@ export default `
   type Query {
     allUsers: [User!]!
     me: User
-    userBoards(owner: String!): [Board!]!
+    userBoards(owner: Int!): [Board!]!
     userSuggestions(creatorId: String!): [Suggestion!]!
   }
 
