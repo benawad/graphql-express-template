@@ -8,6 +8,10 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       unique: true,
     },
+    isAdmin: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
     password: DataTypes.STRING,
   });
 

@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { PubSub } from 'graphql-subscriptions';
+import { requiresAuth, requiresAdmin } from './permissions';
 
 export const pubsub = new PubSub();
 
@@ -76,7 +77,9 @@ export default {
       models.User.update({ username: newUsername }, { where: { username } }),
     deleteUser: (parent, args, { models }) =>
       models.User.destroy({ where: args }),
-    createBoard: (parent, args, { models }) => models.Board.create(args),
+    createBoard: requiresAdmin.createResolver((parent, args, { models }) =>
+      models.Board.create(args),
+    ),
     createSuggestion: (parent, args, { models }) =>
       models.Suggestion.create(args),
     createUser: async (parent, args, { models }) => {
@@ -109,7 +112,7 @@ export default {
       // decode: no secret | use me on the client side
       const token = jwt.sign(
         {
-          user: _.pick(user, ['id', 'username']),
+          user: _.pick(user, ['id', 'username', 'isAdmin']),
         },
         SECRET,
         {
