@@ -8,12 +8,14 @@ import { createServer } from 'http';
 import { execute, subscribe } from 'graphql';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 import _ from 'lodash';
+import DataLoader from 'dataloader';
+import passport from 'passport';
+import FacebookStrategy from 'passport-facebook';
 
 import typeDefs from './schema';
 import resolvers from './resolvers';
 import models from './models';
 import { refreshTokens } from './auth';
-import DataLoader from 'dataloader';
 
 const schema = makeExecutableSchema({
   typeDefs,
@@ -23,6 +25,32 @@ const schema = makeExecutableSchema({
 const SECRET = 'aslkdjlkaj10830912039jlkoaiuwerasdjflkasd';
 
 const app = express();
+
+passport.use(
+  new FacebookStrategy(
+    {
+      clientID: '324894734589925',
+      clientSecret: '95b6ed9340696269e95567452d78aee0',
+      callbackURL: 'https://8fc528a5.ngrok.io/auth/facebook/callback',
+    },
+    (accessToken, refreshToken, profile, cb) => {
+      console.log(profile);
+      cb(null, profile);
+    },
+  ),
+);
+
+app.use(passport.initialize());
+
+app.get('/flogin', passport.authenticate('facebook'));
+
+app.get(
+  '/auth/facebook/callback',
+  passport.authenticate('facebook', { session: false }),
+  (req, res) => {
+    res.send('AUTH WAS GOOD!');
+  },
+);
 
 const addUser = async (req, res, next) => {
   const token = req.headers['x-token'];

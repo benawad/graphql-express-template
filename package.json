@@ -21,6 +21,8 @@
     "graphql-tools": "^1.0.0",
     "jsonwebtoken": "^7.4.1",
     "lodash": "^4.17.4",
+    "passport": "^0.3.2",
+    "passport-facebook": "^2.1.1",
     "sequelize": "^4.1.0",
     "subscriptions-transport-ws": "^0.7.3"
   },
