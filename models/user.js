@@ -4,15 +4,10 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       unique: true,
     },
-    email: {
-      type: DataTypes.STRING,
-      unique: true,
-    },
     isAdmin: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
-    password: DataTypes.STRING,
   });
 
   User.associate = (models) => {

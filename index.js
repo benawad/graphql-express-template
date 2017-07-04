@@ -29,13 +29,34 @@ const app = express();
 passport.use(
   new FacebookStrategy(
     {
-      clientID: '324894734589925',
-      clientSecret: '95b6ed9340696269e95567452d78aee0',
+      clientID: process.env.FACEBOOK_CLIENT_ID,
+      clientSecret: process.env.FACEBOOK_SECRET_ID,
       callbackURL: 'https://8fc528a5.ngrok.io/auth/facebook/callback',
     },
-    (accessToken, refreshToken, profile, cb) => {
+    async (accessToken, refreshToken, profile, cb) => {
+      // 2 cases
+      // #1 first time login
+      // #2 other times
+      const { id, displayName } = profile;
+      // []
+      const fbUsers = await models.FbAuth.findAll({
+        limit: 1,
+        where: { fb_id: id },
+      });
+
+      console.log(fbUsers);
       console.log(profile);
-      cb(null, profile);
+
+      if (!fbUsers.length) {
+        const user = await models.User.create();
+        await models.FbAuth.create({
+          fb_id: id,
+          display_name: displayName,
+          user_id: user.id,
+        });
+      }
+
+      cb(null, {});
     },
   ),
 );
