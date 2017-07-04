@@ -2,10 +2,10 @@ import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import bcrypt from 'bcrypt';
 
-const createTokens = async (user, secret) => {
+export const createTokens = async (user, secret) => {
   const createToken = jwt.sign(
     {
-      user: _.pick(user, ['id', 'isAdmin']),
+      user: _.pick(user, 'id'),
     },
     secret,
     {

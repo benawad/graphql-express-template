@@ -15,7 +15,7 @@ import FacebookStrategy from 'passport-facebook';
 import typeDefs from './schema';
 import resolvers from './resolvers';
 import models from './models';
-import { refreshTokens } from './auth';
+import { createTokens, refreshTokens } from './auth';
 
 const schema = makeExecutableSchema({
   typeDefs,
@@ -49,14 +49,15 @@ passport.use(
 
       if (!fbUsers.length) {
         const user = await models.User.create();
-        await models.FbAuth.create({
+        const fbUser = await models.FbAuth.create({
           fb_id: id,
           display_name: displayName,
           user_id: user.id,
         });
+        fbUsers.push(fbUser);
       }
 
-      cb(null, {});
+      cb(null, fbUsers[0]);
     },
   ),
 );
@@ -68,8 +69,11 @@ app.get('/flogin', passport.authenticate('facebook'));
 app.get(
   '/auth/facebook/callback',
   passport.authenticate('facebook', { session: false }),
-  (req, res) => {
-    res.send('AUTH WAS GOOD!');
+  async (req, res) => {
+    const [token, refreshToken] = await createTokens(req.user, SECRET);
+    res.redirect(
+      `http://localhost:8080/home?token=${token}&refreshToken=${refreshToken}`,
+    );
   },
 );
 
