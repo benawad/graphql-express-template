@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import { PubSub } from 'graphql-subscriptions';
+import _ from 'lodash';
 
 import { requiresAuth, requiresAdmin } from './permissions';
 import { refreshTokens, tryLogin } from './auth';
@@ -88,9 +89,16 @@ export default {
       return userAdded;
     },
     register: async (parent, args, { models }) => {
-      const user = args;
-      user.password = await bcrypt.hash(user.password, 12);
-      return models.User.create(user);
+      const user = _.pick(args, ['username', 'isAdmin']);
+      const localAuth = _.pick(args, ['email', 'password']);
+      const passwordPromise = bcrypt.hash(localAuth.password, 12);
+      const createUserPromise = models.User.create(user);
+      const [password, createdUser] = await Promise.all([passwordPromise, createUserPromise]);
+      localAuth.password = password;
+      return models.LocalAuth.create({
+        ...localAuth,
+        user_id: createdUser.id,
+      });
     },
     login: async (parent, { email, password }, { models, SECRET }) =>
       tryLogin(email, password, models, SECRET),
