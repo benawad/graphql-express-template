@@ -42,7 +42,7 @@ export default {
       }),
   },
   Query: {
-    allUsers: (parent, args, { models }) => models.User.findAll(),
+    allUsers: requiresAuth.createResolver((parent, args, { models }) => models.User.findAll()),
     me: (parent, args, { models, user }) => {
       if (user) {
         // they are logged in

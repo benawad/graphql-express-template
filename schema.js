@@ -19,8 +19,7 @@ export default `
 
   type User {
     id: Int!
-    username: String!
-    email: String!
+    username: String
     createdAt: String!
     updatedAt: String! 
     boards: [Board!]!
