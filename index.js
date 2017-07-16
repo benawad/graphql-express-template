@@ -29,8 +29,8 @@ const app = express();
 passport.use(
   new FacebookStrategy(
     {
-      clientID: process.env.FACEBOOK_CLIENT_ID,
-      clientSecret: process.env.FACEBOOK_SECRET_ID,
+      clientID: 'client_id',
+      clientSecret: 'client_secret',
       callbackURL: 'https://8fc528a5.ngrok.io/auth/facebook/callback',
     },
     async (accessToken, refreshToken, profile, cb) => {
