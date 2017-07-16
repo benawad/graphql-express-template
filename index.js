@@ -143,6 +143,9 @@ app.use(
   })),
 );
 
+app.use(express.static('public'));
+app.use('*', express.static('public'));
+
 const server = createServer(app);
 
 models.sequelize.sync().then(() =>
