@@ -37,6 +37,8 @@ export default `
     me: User
     userBoards(owner: Int!): [Board!]!
     userSuggestions(creatorId: String!): [Suggestion!]!
+    suggestions: [Suggestion!]!
+    someSuggestions(limit: Int!, offset: Int!): [Suggestion!]!
   }
 
   type Mutation {

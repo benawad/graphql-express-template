@@ -30,8 +30,7 @@ export default {
       }),
   },
   Board: {
-    suggestions: ({ id }, args, { suggestionLoader }) =>
-      suggestionLoader.load(id),
+    suggestions: ({ id }, args, { suggestionLoader }) => suggestionLoader.load(id),
   },
   Suggestion: {
     creator: ({ creatorId }, args, { models }) =>
@@ -42,6 +41,8 @@ export default {
       }),
   },
   Query: {
+    suggestions: (parent, args, { models }) => models.Suggestion.findAll(),
+    someSuggestions: (parent, args, { models }) => models.Suggestion.findAll(args),
     allUsers: requiresAuth.createResolver((parent, args, { models }) => models.User.findAll()),
     me: (parent, args, { models, user }) => {
       if (user) {
@@ -72,13 +73,9 @@ export default {
   Mutation: {
     updateUser: (parent, { username, newUsername }, { models }) =>
       models.User.update({ username: newUsername }, { where: { username } }),
-    deleteUser: (parent, args, { models }) =>
-      models.User.destroy({ where: args }),
-    createBoard: requiresAdmin.createResolver((parent, args, { models }) =>
-      models.Board.create(args),
-    ),
-    createSuggestion: (parent, args, { models }) =>
-      models.Suggestion.create(args),
+    deleteUser: (parent, args, { models }) => models.User.destroy({ where: args }),
+    createBoard: (parent, args, { models }) => models.Board.create(args),
+    createSuggestion: (parent, args, { models }) => models.Suggestion.create(args),
     createUser: async (parent, args, { models }) => {
       const user = args;
       user.password = 'idk';
