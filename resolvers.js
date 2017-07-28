@@ -43,6 +43,29 @@ export default {
   Query: {
     suggestions: (parent, args, { models }) => models.Suggestion.findAll(),
     someSuggestions: (parent, args, { models }) => models.Suggestion.findAll(args),
+    someSuggestions2: (parent, { limit, cursor }, { models }) =>
+      models.Suggestion.findAll({
+        limit,
+        where: {
+          id: {
+            $gt: cursor || -1,
+          },
+        },
+        order: ['id'],
+      }),
+    searchSuggestions: (parent, { query, limit, cursor }, { models }) =>
+      models.Suggestion.findAll({
+        limit,
+        where: {
+          text: {
+            $iLike: `%${query}%`,
+          },
+          id: {
+            $gt: cursor || -1,
+          },
+        },
+        order: ['id'],
+      }),
     allUsers: requiresAuth.createResolver((parent, args, { models }) => models.User.findAll()),
     me: (parent, args, { models, user }) => {
       if (user) {

@@ -39,6 +39,8 @@ export default `
     userSuggestions(creatorId: String!): [Suggestion!]!
     suggestions: [Suggestion!]!
     someSuggestions(limit: Int!, offset: Int!): [Suggestion!]!
+    someSuggestions2(limit: Int!, cursor: Int): [Suggestion!]!
+    searchSuggestions(query: String!, limit: Int!, cursor: Int): [Suggestion!]!
   }
 
   type Mutation {
