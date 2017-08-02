@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import bodyParser from 'body-parser';
 import { graphiqlExpress, graphqlExpress } from 'graphql-server-express';
@@ -11,9 +12,6 @@ import _ from 'lodash';
 import DataLoader from 'dataloader';
 import passport from 'passport';
 import FacebookStrategy from 'passport-facebook';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 import typeDefs from './schema';
 import resolvers from './resolvers';
