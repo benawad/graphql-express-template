@@ -3,9 +3,6 @@ export default (sequelize, DataTypes) => {
     title: {
       type: DataTypes.STRING,
     },
-    price: {
-      type: DataTypes.DOUBLE,
-    },
   });
 
   Book.associate = (models) => {
