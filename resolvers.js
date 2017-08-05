@@ -124,5 +124,23 @@ export default {
       tryLogin(email, password, models, SECRET),
     refreshTokens: (parent, { token, refreshToken }, { models, SECRET }) =>
       refreshTokens(token, refreshToken, models, SECRET),
+    createBook: async (parent, args, { models }) => {
+      const book = await models.Book.create(args);
+      return {
+        ...book.dataValues,
+        authors: [],
+      };
+    },
+    createAuthor: async (parent, args, { models }) => {
+      const author = await models.Author.create(args);
+      return {
+        ...author.dataValues,
+        books: [],
+      };
+    },
+    addBookAuthor: async (parent, args, { models }) => {
+      await models.Author.create(args);
+      return true;
+    },
   },
 };
