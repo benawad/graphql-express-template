@@ -47,6 +47,9 @@ export default `
   }
 
   type Query {
+    getBook(id: Int!): Book
+    allBooks: [Book!]!
+    allAuthors: [Author!]!
     allUsers: [User!]!
     me: User
     userBoards(owner: Int!): [Board!]!

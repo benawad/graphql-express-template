@@ -11,16 +11,20 @@ import _ from 'lodash';
 import DataLoader from 'dataloader';
 import passport from 'passport';
 import FacebookStrategy from 'passport-facebook';
+import joinMonsterAdapt from 'join-monster-graphql-tools-adapter';
 
 import typeDefs from './schema';
 import resolvers from './resolvers';
 import models from './models';
 import { createTokens, refreshTokens } from './auth';
+import joinMonsterMetadata from './joinMonsterMetadata';
 
 const schema = makeExecutableSchema({
   typeDefs,
   resolvers,
 });
+
+joinMonsterAdapt(schema, joinMonsterMetadata);
 
 const SECRET = 'aslkdjlkaj10830912039jlkoaiuwerasdjflkasd';
 

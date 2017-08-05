@@ -2,6 +2,12 @@
 # yarn lockfile v1
 
 
+"@stem/nesthydrationjs@0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@stem/nesthydrationjs/-/nesthydrationjs-0.4.0.tgz#5e797efd8b64ea33307ced2a6c4cde9c0227fcf4"
+  dependencies:
+    lodash "4.13.1"
+
 "@types/express-serve-static-core@*":
   version "4.0.46"
   resolved "https://registry.yarnpkg.com/@types/express-serve-static-core/-/express-serve-static-core-4.0.46.tgz#52040d5e37da132296e333be79e3befa1b02b34a"
@@ -1093,6 +1099,10 @@ depd@1.1.0, depd@^1.1.0, depd@~1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/depd/-/depd-1.1.0.tgz#e1bd82c6aab6ced965b97b88b17ed3e528ca18c3"
 
+deprecate@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/deprecate/-/deprecate-1.0.0.tgz#661490ed2428916a6c8883d8834e5646f4e4a4a8"
+
 deprecated-decorator@^0.1.6:
   version "0.1.6"
   resolved "https://registry.yarnpkg.com/deprecated-decorator/-/deprecated-decorator-0.1.6.tgz#00966317b7a12fe92f3cc831f7583af329b86c37"
@@ -1552,6 +1562,10 @@ generate-object-property@^1.1.0:
   dependencies:
     is-property "^1.0.0"
 
+generatorics@^1.0.8:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/generatorics/-/generatorics-1.1.0.tgz#695060bb8d88b909b30171a5cb3d424768661138"
+
 generic-pool@^3.1.6:
   version "3.1.7"
   resolved "https://registry.yarnpkg.com/generic-pool/-/generic-pool-3.1.7.tgz#dac22b2c7a7a04e41732f7d8d2d25a303c88f662"
@@ -1623,6 +1637,10 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.4:
 "graceful-readlink@>= 1.0.0":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/graceful-readlink/-/graceful-readlink-1.0.1.tgz#4cafad76bc62f02fa039b2f94e9a3dd3a391a725"
+
+graphql-relay@^0.5.0:
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/graphql-relay/-/graphql-relay-0.5.2.tgz#40ff714efd60c2cd89e0bcc79e2afa6d87fa8673"
 
 graphql-server-core@^0.8.0:
   version "0.8.0"
@@ -1990,6 +2008,20 @@ joi@^6.10.1:
     moment "2.x.x"
     topo "1.x.x"
 
+join-monster-graphql-tools-adapter@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/join-monster-graphql-tools-adapter/-/join-monster-graphql-tools-adapter-0.0.2.tgz#8f0ef874e104c2d1fab6f32ace190f2cd581d43f"
+
+join-monster@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/join-monster/-/join-monster-2.0.3.tgz#ecb57a0dde6be8b869cd4cdcf25f8c01dd7e55b9"
+  dependencies:
+    "@stem/nesthydrationjs" "0.4.0"
+    debug "^2.6.8"
+    deprecate "^1.0.0"
+    generatorics "^1.0.8"
+    graphql-relay "^0.5.0"
+
 js-tokens@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-3.0.1.tgz#08e9f132484a2c45a30907e9dc4d5567b7f114d7"
@@ -2205,6 +2237,10 @@ lodash.once@^4.0.0:
 lodash.restparam@^3.0.0:
   version "3.6.1"
   resolved "https://registry.yarnpkg.com/lodash.restparam/-/lodash.restparam-3.6.1.tgz#936a4e309ef330a7645ed4145986c85ae5b20805"
+
+lodash@4.13.1:
+  version "4.13.1"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.13.1.tgz#83e4b10913f48496d4d16fec4a560af2ee744b68"
 
 lodash@^4.0.0, lodash@^4.17.1, lodash@^4.17.4, lodash@^4.2.0, lodash@^4.3.0:
   version "4.17.4"

@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import { PubSub } from 'graphql-subscriptions';
 import _ from 'lodash';
+import joinMonster from 'join-monster';
 
 import { requiresAuth, requiresAdmin } from './permissions';
 import { refreshTokens, tryLogin } from './auth';
@@ -41,6 +42,18 @@ export default {
       }),
   },
   Query: {
+    allAuthors: (parent, args, { models }, info) =>
+      joinMonster(info, args, sql =>
+        models.sequelize.query(sql, { type: models.sequelize.QueryTypes.SELECT }),
+      ),
+    getBook: (parent, args, { models }, info) =>
+      joinMonster(info, args, sql =>
+        models.sequelize.query(sql, { type: models.sequelize.QueryTypes.SELECT }),
+      ),
+    allBooks: (parent, args, { models }, info) =>
+      joinMonster(info, args, sql =>
+        models.sequelize.query(sql, { type: models.sequelize.QueryTypes.SELECT }),
+      ),
     suggestions: (parent, args, { models }) => models.Suggestion.findAll(),
     someSuggestions: (parent, args, { models }) => models.Suggestion.findAll(args),
     someSuggestions2: (parent, { limit, cursor }, { models }) =>
@@ -139,7 +152,7 @@ export default {
       };
     },
     addBookAuthor: async (parent, args, { models }) => {
-      await models.Author.create(args);
+      await models.BookAuthor.create(args);
       return true;
     },
   },
