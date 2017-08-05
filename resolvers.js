@@ -43,16 +43,25 @@ export default {
   },
   Query: {
     allAuthors: (parent, args, { models }, info) =>
-      joinMonster(info, args, sql =>
-        models.sequelize.query(sql, { type: models.sequelize.QueryTypes.SELECT }),
+      joinMonster(
+        info,
+        args,
+        sql => models.sequelize.query(sql, { type: models.sequelize.QueryTypes.SELECT }),
+        { dialect: 'pg' },
       ),
     getBook: (parent, args, { models }, info) =>
-      joinMonster(info, args, sql =>
-        models.sequelize.query(sql, { type: models.sequelize.QueryTypes.SELECT }),
+      joinMonster(
+        info,
+        args,
+        sql => models.sequelize.query(sql, { type: models.sequelize.QueryTypes.SELECT }),
+        { dialect: 'pg' },
       ),
     allBooks: (parent, args, { models }, info) =>
-      joinMonster(info, args, sql =>
-        models.sequelize.query(sql, { type: models.sequelize.QueryTypes.SELECT }),
+      joinMonster(
+        info,
+        args,
+        sql => models.sequelize.query(sql, { type: models.sequelize.QueryTypes.SELECT }),
+        { dialect: 'pg' },
       ),
     suggestions: (parent, args, { models }) => models.Suggestion.findAll(),
     someSuggestions: (parent, args, { models }) => models.Suggestion.findAll(args),

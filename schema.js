@@ -48,7 +48,7 @@ export default `
 
   type Query {
     getBook(id: Int!): Book
-    allBooks: [Book!]!
+    allBooks(key: Int!, limit: Int!): [Book!]!
     allAuthors: [Author!]!
     allUsers: [User!]!
     me: User

@@ -4,6 +4,11 @@ export default {
       getBook: {
         where: (table, empty, args) => `${table}.id = ${args.id}`,
       },
+      allBooks: {
+        limit: (table, { limit }) => limit,
+        orderBy: 'id',
+        where: (table, empty, { key }) => `${table}.id > ${key}`,
+      },
     },
   },
   Author: {
