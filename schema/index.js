@@ -1,21 +1,26 @@
+import * as Suggestion from './Suggestion';
+import * as Board from './Board';
+import * as Book from './Book';
+
+const types = [];
+const queries = [];
+const mutations = [];
+
+const schemas = [Suggestion, Board, Book];
+
+schemas.forEach((s) => {
+  types.push(s.types);
+  queries.push(s.queries);
+  mutations.push(s.mutations);
+});
+
 export default `
 
   type Subscription {
     userAdded: User!
   }
 
-  type Suggestion {
-    id: Int!
-    text: String!
-    creator: User!
-  }
-
-  type Board {
-    id: Int!
-    name: String!
-    suggestions: [Suggestion!]!
-    owner: Int!
-  }
+  ${types.join('\n')}
 
   type User {
     id: Int!
@@ -40,34 +45,18 @@ export default `
     books: [Book!]!
   }
 
-  type Book {
-    id: Int!
-    title: String!
-    authors: [Author!]!
-  }
-
   type Query {
-    getBook(id: Int!): Book
-    allBooks(key: Int!, limit: Int!): [Book!]!
     allAuthors: [Author!]!
     allUsers: [User!]!
     me: User
-    userBoards(owner: Int!): [Board!]!
-    userSuggestions(creatorId: String!): [Suggestion!]!
-    suggestions: [Suggestion!]!
-    someSuggestions(limit: Int!, offset: Int!): [Suggestion!]!
-    someSuggestions2(limit: Int!, cursor: Int): [Suggestion!]!
-    searchSuggestions(query: String!, limit: Int!, cursor: Int): [Suggestion!]!
+    ${queries.join('\n')}
   }
 
   type Mutation {
+    ${mutations.join('\n')}
     createAuthor(firstname: String!, lastname: String!): Author!
-    createBook(title: String!): Book!
-    addBookAuthor(bookId: Int!, authorId: Int!, primary: Boolean!): Boolean!
     updateUser(username: String!, newUsername: String!): [Int!]!
     deleteUser(username: String!): Int!
-    createBoard(owner: Int!, name: String): Board!
-    createSuggestion(creatorId: Int!, text: String, boardId: Int!): Suggestion!
     register(username: String!, email: String!, password: String!, isAdmin: Boolean): User!
     login(email: String!, password: String!): AuthPayload!
     createUser(username: String!): User!
