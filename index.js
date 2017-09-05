@@ -7,16 +7,12 @@ import jwt from 'jsonwebtoken';
 import { createServer } from 'http';
 import { execute, subscribe } from 'graphql';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
-import _ from 'lodash';
-import DataLoader from 'dataloader';
-import passport from 'passport';
-import FacebookStrategy from 'passport-facebook';
 import joinMonsterAdapt from 'join-monster-graphql-tools-adapter';
 
 import typeDefs from './schema';
 import resolvers from './resolvers';
 import models from './models';
-import { createTokens, refreshTokens } from './auth';
+import { refreshTokens } from './auth';
 import joinMonsterMetadata from './joinMonsterMetadata';
 
 const schema = makeExecutableSchema({
@@ -27,61 +23,12 @@ const schema = makeExecutableSchema({
 joinMonsterAdapt(schema, joinMonsterMetadata);
 
 const SECRET = 'aslkdjlkaj10830912039jlkoaiuwerasdjflkasd';
+const SECRET_2 = 'ajsdklfjaskljgklasjoiquw01982310nlksas;sdlkfj';
 
 const app = express();
 
-passport.use(
-  new FacebookStrategy(
-    {
-      clientID: 'client_id',
-      clientSecret: 'client_secret',
-      callbackURL: 'https://8fc528a5.ngrok.io/auth/facebook/callback',
-    },
-    async (accessToken, refreshToken, profile, cb) => {
-      // 2 cases
-      // #1 first time login
-      // #2 other times
-      const { id, displayName } = profile;
-      // []
-      const fbUsers = await models.FbAuth.findAll({
-        limit: 1,
-        where: { fb_id: id },
-      });
-
-      console.log(fbUsers);
-      console.log(profile);
-
-      if (!fbUsers.length) {
-        const user = await models.User.create();
-        const fbUser = await models.FbAuth.create({
-          fb_id: id,
-          display_name: displayName,
-          user_id: user.id,
-        });
-        fbUsers.push(fbUser);
-      }
-
-      cb(null, fbUsers[0]);
-    },
-  ),
-);
-
-app.use(passport.initialize());
-
-app.get('/flogin', passport.authenticate('facebook'));
-
-app.get(
-  '/auth/facebook/callback',
-  passport.authenticate('facebook', { session: false }),
-  async (req, res) => {
-    const [token, refreshToken] = await createTokens(req.user, SECRET);
-    res.redirect(`http://localhost:8080/home?token=${token}&refreshToken=${refreshToken}`);
-  },
-);
-
 const addUser = async (req, res, next) => {
   const token = req.headers['x-token'];
-  console.log(token);
   if (token) {
     try {
       const { user } = jwt.verify(token, SECRET);
@@ -110,22 +57,6 @@ app.use(
   }),
 );
 
-const batchSuggestions = async (keys, { Suggestion }) => {
-  // keys = [1, 2, 3 ..., 13]
-  const suggestions = await Suggestion.findAll({
-    raw: true,
-    where: {
-      boardId: {
-        $in: keys,
-      },
-    },
-  });
-  // suggestion = [{text:'hi', boardId: 1}, {text: 'bye', boardId: 2}, {text: 'bye2'. boardId: 2}]
-  const gs = _.groupBy(suggestions, 'boardId');
-  // gs = {1: [{text:'hi', boardId: 1}], 2: [{text: 'bye', boardId: 2}, {text: 'bye2'. boardId: 2}]}
-  return keys.map(k => gs[k] || []);
-};
-
 app.use(
   '/graphql',
   bodyParser.json(),
@@ -134,8 +65,8 @@ app.use(
     context: {
       models,
       SECRET,
+      SECRET_2,
       user: req.user,
-      suggestionLoader: new DataLoader(keys => batchSuggestions(keys, models)),
     },
   })),
 );

@@ -2,14 +2,14 @@ import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import bcrypt from 'bcrypt';
 
-export const createTokens = async (user, secret) => {
+export const createTokens = async (user, secret, secret2) => {
   const createToken = jwt.sign(
     {
       user: _.pick(user, ['id', 'isAdmin']),
     },
     secret,
     {
-      expiresIn: '20m',
+      expiresIn: '1m',
     },
   );
 
@@ -17,7 +17,7 @@ export const createTokens = async (user, secret) => {
     {
       user: _.pick(user, 'id'),
     },
-    secret,
+    secret2,
     {
       expiresIn: '7d',
     },
@@ -26,7 +26,7 @@ export const createTokens = async (user, secret) => {
   return Promise.all([createToken, createRefreshToken]);
 };
 
-export const refreshTokens = async (token, refreshToken, models, SECRET) => {
+export const refreshTokens = async (token, refreshToken, models, SECRET, SECRET_2) => {
   let userId = -1;
   try {
     const { user: { id } } = jwt.verify(refreshToken, SECRET);
@@ -35,9 +35,25 @@ export const refreshTokens = async (token, refreshToken, models, SECRET) => {
     return {};
   }
 
+  if (!userId) {
+    return {};
+  }
+
   const user = await models.User.findOne({ where: { id: userId }, raw: true });
 
-  const [newToken, newRefreshToken] = await createTokens(user, SECRET);
+  if (!user) {
+    return {};
+  }
+
+  const refreshSecret = SECRET_2 + user.password;
+
+  try {
+    jwt.verify(refreshToken, refreshSecret);
+  } catch (err) {
+    return {};
+  }
+
+  const [newToken, newRefreshToken] = await createTokens(user, SECRET, refreshSecret);
   return {
     token: newToken,
     refreshToken: newRefreshToken,
@@ -45,22 +61,20 @@ export const refreshTokens = async (token, refreshToken, models, SECRET) => {
   };
 };
 
-export const tryLogin = async (email, password, models, SECRET) => {
-  const localAuth = await models.LocalAuth.findOne({ where: { email }, raw: true });
-  if (!localAuth) {
+export const tryLogin = async (email, password, models, SECRET, SECRET_2) => {
+  const user = await models.User.findOne({ where: { email }, raw: true });
+  if (!user) {
     // user with provided email not found
     throw new Error('Invalid login');
   }
 
-  const valid = await bcrypt.compare(password, localAuth.password);
+  const valid = await bcrypt.compare(password, user.password);
   if (!valid) {
     // bad password
     throw new Error('Invalid login');
   }
 
-  const user = await models.User.findOne({ where: { id: localAuth.user_id }, raw: true });
-
-  const [token, refreshToken] = await createTokens(user, SECRET);
+  const [token, refreshToken] = await createTokens(user, SECRET, SECRET_2 + user.password);
 
   return {
     token,

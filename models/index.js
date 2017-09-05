@@ -9,8 +9,6 @@ const db = {
   User: sequelize.import('./user'),
   Board: sequelize.import('./board'),
   Suggestion: sequelize.import('./suggestion'),
-  FbAuth: sequelize.import('./fbAuth'),
-  LocalAuth: sequelize.import('./localAuth'),
   Book: sequelize.import('./book'),
   Author: sequelize.import('./author'),
   BookAuthor: sequelize.import('./bookAuthor'),

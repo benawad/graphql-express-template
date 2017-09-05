@@ -4,6 +4,11 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       unique: true,
     },
+    email: {
+      type: DataTypes.STRING,
+      unique: true,
+    },
+    password: DataTypes.STRING,
     isAdmin: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,

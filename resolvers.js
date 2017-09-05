@@ -131,21 +131,17 @@ export default {
       return userAdded;
     },
     register: async (parent, args, { models }) => {
-      const user = _.pick(args, ['username', 'isAdmin']);
-      const localAuth = _.pick(args, ['email', 'password']);
-      const passwordPromise = bcrypt.hash(localAuth.password, 12);
-      const createUserPromise = models.User.create(user);
-      const [password, createdUser] = await Promise.all([passwordPromise, createUserPromise]);
-      localAuth.password = password;
-      return models.LocalAuth.create({
-        ...localAuth,
-        user_id: createdUser.id,
+      const hashedPassword = await bcrypt.hash(args.password, 12);
+      const user = await models.User.create({
+        ...args,
+        password: hashedPassword,
       });
+      return user;
     },
-    login: async (parent, { email, password }, { models, SECRET }) =>
-      tryLogin(email, password, models, SECRET),
-    refreshTokens: (parent, { token, refreshToken }, { models, SECRET }) =>
-      refreshTokens(token, refreshToken, models, SECRET),
+    login: async (parent, { email, password }, { models, SECRET, SECRET_2 }) =>
+      tryLogin(email, password, models, SECRET, SECRET_2),
+    refreshTokens: (parent, { token, refreshToken }, { models, SECRET, SECRET_2 }) =>
+      refreshTokens(token, refreshToken, models, SECRET, SECRET_2),
     createBook: async (parent, args, { models }) => {
       const book = await models.Book.create(args);
       return {
