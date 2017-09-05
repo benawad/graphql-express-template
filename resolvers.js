@@ -49,13 +49,14 @@ export default {
         sql => models.sequelize.query(sql, { type: models.sequelize.QueryTypes.SELECT }),
         { dialect: 'pg' },
       ),
-    getBook: (parent, args, { models }, info) =>
+    getBook: requiresAuth.createResolver((parent, args, { models }, info) =>
       joinMonster(
         info,
         args,
         sql => models.sequelize.query(sql, { type: models.sequelize.QueryTypes.SELECT }),
         { dialect: 'pg' },
       ),
+    ),
     allBooks: (parent, args, { models }, info) =>
       joinMonster(
         info,
@@ -142,6 +143,15 @@ export default {
       tryLogin(email, password, models, SECRET, SECRET_2),
     refreshTokens: (parent, { token, refreshToken }, { models, SECRET, SECRET_2 }) =>
       refreshTokens(token, refreshToken, models, SECRET, SECRET_2),
+    forgetPassword: async (parent, { userId, newPassword }, { models }) => {
+      try {
+        const hashedPassword = await bcrypt.hash(newPassword, 12);
+        await models.User.update({ password: hashedPassword }, { where: { id: userId } });
+        return true;
+      } catch (e) {
+        return false;
+      }
+    },
     createBook: async (parent, args, { models }) => {
       const book = await models.Book.create(args);
       return {

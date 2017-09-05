@@ -29,7 +29,7 @@ export const createTokens = async (user, secret, secret2) => {
 export const refreshTokens = async (token, refreshToken, models, SECRET, SECRET_2) => {
   let userId = -1;
   try {
-    const { user: { id } } = jwt.verify(refreshToken, SECRET);
+    const { user: { id } } = jwt.decode(refreshToken);
     userId = id;
   } catch (err) {
     return {};
