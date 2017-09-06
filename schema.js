@@ -70,7 +70,7 @@ export default `
     createBoard(owner: Int!, name: String): Board!
     createSuggestion(creatorId: Int!, text: String, boardId: Int!): Suggestion!
     register(username: String!, email: String!, password: String!, isAdmin: Boolean): User!
-    login(email: String!, password: String!): AuthPayload!
+    login(email: String!, password: String!): Boolean
     createUser(username: String!): User!
     refreshTokens(token: String!, refreshToken: String!): AuthPayload!
   }

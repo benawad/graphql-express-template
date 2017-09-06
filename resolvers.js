@@ -141,11 +141,8 @@ export default {
     login: async (parent, { email, password }, { models, SECRET, SECRET_2, res }) => {
       const { token, refreshToken } = await tryLogin(email, password, models, SECRET, SECRET_2);
       res.cookie('token', token, { maxAge: 60 * 60 * 24 * 7, httpOnly: true });
-      res.cookie('refresh-token', token, { maxAge: 60 * 60 * 24 * 7, httpOnly: true });
-      return {
-        token,
-        refreshToken,
-      };
+      res.cookie('refresh-token', refreshToken, { maxAge: 60 * 60 * 24 * 7, httpOnly: true });
+      return true;
     },
     refreshTokens: (parent, { token, refreshToken }, { models, SECRET, SECRET_2 }) =>
       refreshTokens(token, refreshToken, models, SECRET, SECRET_2),

@@ -29,13 +29,8 @@ const SECRET_2 = 'ajsdklfjaskljgklasjoiquw01982310nlksas;sdlkfj';
 const app = express();
 
 const addUser = async (req, res, next) => {
-  const token = req.headers['x-token'];
+  const token = req.cookies.token;
   if (!token) {
-    return next();
-  }
-
-  const cookieToken = req.cookies.token;
-  if (!cookieToken || token !== cookieToken) {
     return next();
   }
 
@@ -43,24 +38,14 @@ const addUser = async (req, res, next) => {
     const { user } = jwt.verify(token, SECRET);
     req.user = user;
   } catch (err) {
-    const refreshToken = req.headers['x-refresh-token'];
+    const refreshToken = req.cookies['refresh-token'];
 
     if (!refreshToken) {
       return next();
     }
 
-    const cookieRefreshToken = req.cookies['refresh-token'];
-    if (!cookieRefreshToken || refreshToken !== cookieRefreshToken) {
-      return next();
-    }
-
     const newTokens = await refreshTokens(token, refreshToken, models, SECRET, SECRET_2);
     if (newTokens.token && newTokens.refreshToken) {
-      // settings headers used by the client to store the tokens in localStorage
-      res.set('Access-Control-Expose-Headers', 'x-token, x-refresh-token');
-      res.set('x-token', newTokens.token);
-      res.set('x-refresh-token', newTokens.refreshToken);
-      // set cookie
       res.cookie('token', newTokens.token, { maxAge: 60 * 60 * 24 * 7, httpOnly: true });
       res.cookie('refresh-token', newTokens.refreshToken, {
         maxAge: 60 * 60 * 24 * 7,
