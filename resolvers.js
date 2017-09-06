@@ -1,9 +1,8 @@
 import bcrypt from 'bcrypt';
 import { PubSub } from 'graphql-subscriptions';
-import _ from 'lodash';
 import joinMonster from 'join-monster';
 
-import { requiresAuth, requiresAdmin } from './permissions';
+import { requiresAuth } from './permissions';
 import { refreshTokens, tryLogin } from './auth';
 
 export const pubsub = new PubSub();
@@ -139,8 +138,15 @@ export default {
       });
       return user;
     },
-    login: async (parent, { email, password }, { models, SECRET, SECRET_2 }) =>
-      tryLogin(email, password, models, SECRET, SECRET_2),
+    login: async (parent, { email, password }, { models, SECRET, SECRET_2, res }) => {
+      const { token, refreshToken } = await tryLogin(email, password, models, SECRET, SECRET_2);
+      res.cookie('token', token, { maxAge: 60 * 60 * 24 * 7, httpOnly: true });
+      res.cookie('refresh-token', token, { maxAge: 60 * 60 * 24 * 7, httpOnly: true });
+      return {
+        token,
+        refreshToken,
+      };
+    },
     refreshTokens: (parent, { token, refreshToken }, { models, SECRET, SECRET_2 }) =>
       refreshTokens(token, refreshToken, models, SECRET, SECRET_2),
     forgetPassword: async (parent, { userId, newPassword }, { models }) => {
