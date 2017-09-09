@@ -9,6 +9,10 @@ export default (sequelize, DataTypes) => {
       unique: true,
     },
     password: DataTypes.STRING,
+    confirmed: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
     isAdmin: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,

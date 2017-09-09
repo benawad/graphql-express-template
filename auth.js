@@ -68,6 +68,10 @@ export const tryLogin = async (email, password, models, SECRET, SECRET_2) => {
     throw new Error('Invalid login');
   }
 
+  if (!user.confirmed) {
+    throw new Error('Please confirm your email to login');
+  }
+
   const valid = await bcrypt.compare(password, user.password);
   if (!valid) {
     // bad password

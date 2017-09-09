@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import bodyParser from 'body-parser';
 import { graphiqlExpress, graphqlExpress } from 'graphql-server-express';
@@ -8,6 +9,7 @@ import { createServer } from 'http';
 import { execute, subscribe } from 'graphql';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 import joinMonsterAdapt from 'join-monster-graphql-tools-adapter';
+import nodemailer from 'nodemailer';
 
 import typeDefs from './schema';
 import resolvers from './resolvers';
@@ -22,8 +24,17 @@ const schema = makeExecutableSchema({
 
 joinMonsterAdapt(schema, joinMonsterMetadata);
 
+const transporter = nodemailer.createTransport({
+  service: 'Gmail',
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_PASS,
+  },
+});
+
 const SECRET = 'aslkdjlkaj10830912039jlkoaiuwerasdjflkasd';
 const SECRET_2 = 'ajsdklfjaskljgklasjoiquw01982310nlksas;sdlkfj';
+const EMAIL_SECRET = 'asdf1093KMnzxcvnkljvasdu09123nlasdasdf';
 
 const app = express();
 
@@ -50,6 +61,17 @@ const addUser = async (req, res, next) => {
 app.use(cors('*'));
 app.use(addUser);
 
+app.get('/confirmation/:token', async (req, res) => {
+  try {
+    const { user: { id } } = jwt.verify(req.params.token, EMAIL_SECRET);
+    await models.User.update({ confirmed: true }, { where: { id } });
+  } catch (e) {
+    res.send('error');
+  }
+
+  return res.redirect('http://localhost:3001/login');
+});
+
 app.use(
   '/graphiql',
   graphiqlExpress({
@@ -66,6 +88,8 @@ app.use(
       models,
       SECRET,
       SECRET_2,
+      EMAIL_SECRET,
+      transporter,
       user: req.user,
     },
   })),
@@ -73,7 +97,7 @@ app.use(
 
 const server = createServer(app);
 
-models.sequelize.sync().then(() =>
+models.sequelize.sync({ force: true }).then(() =>
   server.listen(3000, () => {
     new SubscriptionServer(
       {

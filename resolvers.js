@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import { PubSub } from 'graphql-subscriptions';
 import _ from 'lodash';
 import joinMonster from 'join-monster';
+import jwt from 'jsonwebtoken';
 
 import { requiresAuth, requiresAdmin } from './permissions';
 import { refreshTokens, tryLogin } from './auth';
@@ -131,12 +132,55 @@ export default {
       });
       return userAdded;
     },
-    register: async (parent, args, { models }) => {
+    register: async (parent, args, { transporter, models, EMAIL_SECRET }) => {
       const hashedPassword = await bcrypt.hash(args.password, 12);
       const user = await models.User.create({
         ...args,
         password: hashedPassword,
       });
+
+      // async email
+      jwt.sign(
+        {
+          user: _.pick(user, 'id'),
+        },
+        EMAIL_SECRET,
+        {
+          expiresIn: '1d',
+        },
+        (err, emailToken) => {
+          const url = `http://localhost:3000/confirmation/${emailToken}`;
+
+          transporter.sendMail({
+            to: args.email,
+            subject: 'Confirm Email',
+            html: `Please click this email to confirm your email: <a href="${url}">${url}</a>`,
+          });
+        },
+      );
+
+      // try {
+      //   const emailToken = jwt.sign(
+      //     {
+      //       user: _.pick(user, 'id'),
+      //     },
+      //     EMAIL_SECRET,
+      //     {
+      //       expiresIn: '1d',
+      //     },
+      //   );
+
+      //   const url = `http://localhost:3000/confirmation/${emailToken}`;
+
+      //   await transporter.sendMail({
+      //     to: args.email,
+      //     subject: 'Confirm Email',
+      //     html: `Please click this email to confirm your email: <a href="${url}">${url}</a>`,
+      //   });
+      // } catch (e) {
+      //   console.log(e);
+      // }
+
       return user;
     },
     login: async (parent, { email, password }, { models, SECRET, SECRET_2 }) =>
