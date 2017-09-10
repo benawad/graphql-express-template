@@ -42,6 +42,7 @@ export default {
       }),
   },
   Query: {
+    getChampion: (parent, { id }, { models }) => models.Champion.findOne({ where: { id } }),
     allAuthors: (parent, args, { models }, info) =>
       joinMonster(
         info,
@@ -117,6 +118,7 @@ export default {
   },
 
   Mutation: {
+    createChampion: (parent, args, { models }) => models.Champion.create(args),
     updateUser: (parent, { username, newUsername }, { models }) =>
       models.User.update({ username: newUsername }, { where: { username } }),
     deleteUser: (parent, args, { models }) => models.User.destroy({ where: args }),

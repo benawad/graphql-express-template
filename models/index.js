@@ -12,6 +12,7 @@ const db = {
   Book: sequelize.import('./book'),
   Author: sequelize.import('./author'),
   BookAuthor: sequelize.import('./bookAuthor'),
+  Champion: sequelize.import('./champion'),
 };
 
 Object.keys(db).forEach((modelName) => {

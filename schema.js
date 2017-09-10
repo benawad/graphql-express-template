@@ -46,7 +46,14 @@ export default `
     authors: [Author!]!
   }
 
+  type Champion {
+    id: Int!
+    name: String!
+    publicId: String!
+  }
+
   type Query {
+    getChampion(id: Int!): Champion
     getBook(id: Int!): Book
     allBooks(key: Int!, limit: Int!): [Book!]!
     allAuthors: [Author!]!
@@ -61,6 +68,7 @@ export default `
   }
 
   type Mutation {
+    createChampion(name: String!, publicId: String!): Champion!
     forgetPassword(userId: Int!, newPassword: String!): Boolean!
     createAuthor(firstname: String!, lastname: String!): Author!
     createBook(title: String!): Book!
