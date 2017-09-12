@@ -1,0 +1,9 @@
+{
+  "development": {
+    "username": "test_graphql_admin",
+    "password": "iamapassword",
+    "database": "test_graphql_db",
+    "host": "localhost",
+    "dialect": "postgres"
+  }
+}

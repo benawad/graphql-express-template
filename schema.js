@@ -53,6 +53,7 @@ export default `
   }
 
   type Query {
+    searchBooks(title: String!): [Book!]!
     getChampion(id: Int!): Champion
     getBook(id: Int!): Book
     allBooks(key: Int!, limit: Int!): [Book!]!

@@ -42,6 +42,8 @@ export default {
       }),
   },
   Query: {
+    searchBooks: (parent, { title }, { models }) =>
+      models.Book.findAll({ where: { title: { $iLike: `%${title}%` } } }, { raw: true }),
     getChampion: (parent, { id }, { models }) => models.Champion.findOne({ where: { id } }),
     allAuthors: (parent, args, { models }, info) =>
       joinMonster(
