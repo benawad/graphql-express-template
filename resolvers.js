@@ -142,7 +142,7 @@ export default {
       const hashedPassword = await bcrypt.hash(args.password, 12);
       let user = null;
       if (previousAccount) {
-        previousAccount.update({
+        user = await previousAccount.update({
           username: args.username,
           password: hashedPassword,
         });
