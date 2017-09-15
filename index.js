@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import bodyParser from 'body-parser';
 import { graphiqlExpress, graphqlExpress } from 'graphql-server-express';
@@ -8,11 +9,13 @@ import { createServer } from 'http';
 import { execute, subscribe } from 'graphql';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 import joinMonsterAdapt from 'join-monster-graphql-tools-adapter';
+import passport from 'passport';
+import FacebookStrategy from 'passport-facebook';
 
 import typeDefs from './schema';
 import resolvers from './resolvers';
 import models from './models';
-import { refreshTokens } from './auth';
+import { createTokens, refreshTokens } from './auth';
 import joinMonsterMetadata from './joinMonsterMetadata';
 
 const schema = makeExecutableSchema({
@@ -26,6 +29,61 @@ const SECRET = 'aslkdjlkaj10830912039jlkoaiuwerasdjflkasd';
 const SECRET_2 = 'ajsdklfjaskljgklasjoiquw01982310nlksas;sdlkfj';
 
 const app = express();
+
+passport.use(
+  new FacebookStrategy(
+    {
+      clientID: process.env.FACEBOOK_CLIENT_ID,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+      callbackURL: 'http://localhost:3000/auth/facebook/callback',
+      scope: ['email'],
+      profileFields: ['id', 'emails'],
+    },
+    async (accessToken, refreshToken, profile, cb) => {
+      // 2 cases
+      // #1 first time login
+      // #2 previously logged in with facebook
+      // #3 previously registered with email
+      const { id, emails: [{ value }] } = profile;
+      // []
+      let fbUser = await models.User.findOne({
+        where: { $or: [{ fbId: id }, { email: value }] },
+      });
+
+      console.log(fbUser);
+      console.log(profile);
+
+      if (!fbUser) {
+        // case #1
+        fbUser = await models.User.create({
+          fbId: id,
+          email: value,
+        });
+      } else if (!fbUser.fbId) {
+        // case #3
+        // add email to user
+        await fbUser.update({
+          fbId: id,
+        });
+      }
+
+      cb(null, fbUser);
+    },
+  ),
+);
+
+app.use(passport.initialize());
+
+app.get('/flogin', passport.authenticate('facebook'));
+
+app.get(
+  '/auth/facebook/callback',
+  passport.authenticate('facebook', { session: false }),
+  async (req, res) => {
+    const [token, refreshToken] = await createTokens(req.user, SECRET, SECRET_2);
+    res.redirect(`http://localhost:3001/home?token=${token}&refreshToken=${refreshToken}`);
+  },
+);
 
 const addUser = async (req, res, next) => {
   const token = req.headers['x-token'];
@@ -73,7 +131,7 @@ app.use(
 
 const server = createServer(app);
 
-models.sequelize.sync().then(() =>
+models.sequelize.sync({ force: true }).then(() =>
   server.listen(3000, () => {
     new SubscriptionServer(
       {

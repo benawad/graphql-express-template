@@ -1,19 +1,30 @@
 export default (sequelize, DataTypes) => {
-  const User = sequelize.define('User', {
-    username: {
-      type: DataTypes.STRING,
-      unique: true,
+  const User = sequelize.define(
+    'User',
+    {
+      fbId: DataTypes.BIGINT(20),
+      username: {
+        type: DataTypes.STRING,
+        unique: true,
+      },
+      email: {
+        type: DataTypes.STRING,
+        unique: true,
+      },
+      password: DataTypes.STRING,
+      isAdmin: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
     },
-    email: {
-      type: DataTypes.STRING,
-      unique: true,
+    {
+      indexes: [
+        {
+          fields: ['"fbId"'],
+        },
+      ],
     },
-    password: DataTypes.STRING,
-    isAdmin: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
-  });
+  );
 
   User.associate = (models) => {
     // 1 to many with board

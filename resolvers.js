@@ -136,11 +136,22 @@ export default {
       return userAdded;
     },
     register: async (parent, args, { models }) => {
-      const hashedPassword = await bcrypt.hash(args.password, 12);
-      const user = await models.User.create({
-        ...args,
-        password: hashedPassword,
+      const previousAccount = await models.User.findOne({
+        where: { $and: [{ email: args.email }, { password: { $eq: null } }] },
       });
+      const hashedPassword = await bcrypt.hash(args.password, 12);
+      let user = null;
+      if (previousAccount) {
+        previousAccount.update({
+          username: args.username,
+          password: hashedPassword,
+        });
+      } else {
+        user = await models.User.create({
+          ...args,
+          password: hashedPassword,
+        });
+      }
       return user;
     },
     login: async (parent, { email, password }, { models, SECRET, SECRET_2 }) =>
