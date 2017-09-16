@@ -26,7 +26,6 @@ const schema = makeExecutableSchema({
 joinMonsterAdapt(schema, joinMonsterMetadata);
 
 const SECRET = 'aslkdjlkaj10830912039jlkoaiuwerasdjflkasd';
-const SECRET_2 = 'ajsdklfjaskljgklasjoiquw01982310nlksas;sdlkfj';
 
 const app = express();
 
@@ -80,7 +79,7 @@ app.get(
   '/auth/facebook/callback',
   passport.authenticate('facebook', { session: false }),
   async (req, res) => {
-    const [token, refreshToken] = await createTokens(req.user, SECRET, SECRET_2);
+    const [token, refreshToken] = await createTokens(req.user, SECRET, req.user.refreshSecret);
     res.redirect(`http://localhost:3001/home?token=${token}&refreshToken=${refreshToken}`);
   },
 );
@@ -93,7 +92,7 @@ const addUser = async (req, res, next) => {
       req.user = user;
     } catch (err) {
       const refreshToken = req.headers['x-refresh-token'];
-      const newTokens = await refreshTokens(token, refreshToken, models, SECRET, SECRET_2);
+      const newTokens = await refreshTokens(token, refreshToken, models, SECRET);
       if (newTokens.token && newTokens.refreshToken) {
         res.set('Access-Control-Expose-Headers', 'x-token, x-refresh-token');
         res.set('x-token', newTokens.token);
@@ -123,7 +122,6 @@ app.use(
     context: {
       models,
       SECRET,
-      SECRET_2,
       user: req.user,
     },
   })),

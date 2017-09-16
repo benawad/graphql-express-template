@@ -26,7 +26,7 @@ export const createTokens = async (user, secret, secret2) => {
   return Promise.all([createToken, createRefreshToken]);
 };
 
-export const refreshTokens = async (token, refreshToken, models, SECRET, SECRET_2) => {
+export const refreshTokens = async (token, refreshToken, models, SECRET) => {
   let userId = -1;
   try {
     const { user: { id } } = jwt.decode(refreshToken);
@@ -45,15 +45,13 @@ export const refreshTokens = async (token, refreshToken, models, SECRET, SECRET_
     return {};
   }
 
-  const refreshSecret = SECRET_2 + user.password;
-
   try {
-    jwt.verify(refreshToken, refreshSecret);
+    jwt.verify(refreshToken, user.refreshSecret);
   } catch (err) {
     return {};
   }
 
-  const [newToken, newRefreshToken] = await createTokens(user, SECRET, refreshSecret);
+  const [newToken, newRefreshToken] = await createTokens(user, SECRET, user.refreshSecret);
   return {
     token: newToken,
     refreshToken: newRefreshToken,
@@ -61,7 +59,7 @@ export const refreshTokens = async (token, refreshToken, models, SECRET, SECRET_
   };
 };
 
-export const tryLogin = async (email, password, models, SECRET, SECRET_2) => {
+export const tryLogin = async (email, password, models, SECRET) => {
   const user = await models.User.findOne({ where: { email }, raw: true });
   if (!user) {
     // user with provided email not found
@@ -74,7 +72,7 @@ export const tryLogin = async (email, password, models, SECRET, SECRET_2) => {
     throw new Error('Invalid login');
   }
 
-  const [token, refreshToken] = await createTokens(user, SECRET, SECRET_2 + user.password);
+  const [token, refreshToken] = await createTokens(user, SECRET, user.refreshSecret);
 
   return {
     token,

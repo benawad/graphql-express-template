@@ -12,6 +12,10 @@ export default (sequelize, DataTypes) => {
         unique: true,
       },
       password: DataTypes.STRING,
+      refreshSecret: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+      },
       isAdmin: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
