@@ -52,6 +52,12 @@ export default `
     publicId: String!
   }
 
+  type Student {
+    testScore1: Int!
+    testScore2: Int!
+    testScore3: Int!
+  }
+
   type Query {
     searchBooks(title: String!): [Book!]!
     getChampion(id: Int!): Champion
@@ -69,6 +75,7 @@ export default `
   }
 
   type Mutation {
+    createStudent(testScore1: Int!, testScore2: Int!, testScore3: Int!): Student!
     createChampion(name: String!, publicId: String!): Champion!
     forgetPassword(userId: Int!, newPassword: String!): Boolean!
     createAuthor(firstname: String!, lastname: String!): Author!

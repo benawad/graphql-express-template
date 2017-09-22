@@ -120,6 +120,7 @@ export default {
   },
 
   Mutation: {
+    createStudent: (parent, args, { models }) => models.Student.create(args),
     createChampion: (parent, args, { models }) => models.Champion.create(args),
     updateUser: (parent, { username, newUsername }, { models }) =>
       models.User.update({ username: newUsername }, { where: { username } }),
