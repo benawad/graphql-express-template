@@ -10,6 +10,13 @@ export const pubsub = new PubSub();
 
 const USER_ADDED = 'USER_ADDED';
 
+const formatErrors = (e, models) => {
+  if (e instanceof models.sequelize.ValidationError) {
+    return e.errors.map(x => _.pick(x, ['path', 'message']));
+  }
+  return [{ path: 'name', message: 'something went wrong' }];
+};
+
 export default {
   Subscription: {
     userAdded: {
@@ -137,23 +144,22 @@ export default {
       return userAdded;
     },
     register: async (parent, args, { models }) => {
-      const previousAccount = await models.User.findOne({
-        where: { $and: [{ email: args.email }, { password: { $eq: null } }] },
-      });
       const hashedPassword = await bcrypt.hash(args.password, 12);
-      let user = null;
-      if (previousAccount) {
-        user = await previousAccount.update({
-          username: args.username,
-          password: hashedPassword,
-        });
-      } else {
-        user = await models.User.create({
+      try {
+        const user = await models.User.create({
           ...args,
           password: hashedPassword,
         });
+        return {
+          ok: true,
+          user,
+        };
+      } catch (e) {
+        return {
+          ok: false,
+          errors: formatErrors(e, models),
+        };
       }
-      return user;
     },
     login: async (parent, { email, password }, { models, SECRET, SECRET_2 }) =>
       tryLogin(email, password, models, SECRET, SECRET_2),

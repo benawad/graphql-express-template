@@ -2,16 +2,24 @@ export default (sequelize, DataTypes) => {
   const User = sequelize.define(
     'User',
     {
-      fbId: DataTypes.BIGINT(20),
+      fbId: DataTypes.BIGINT(),
       username: {
         type: DataTypes.STRING,
         unique: true,
+        validate: {
+          len: {
+            args: [5, 10],
+            msg: "Username needs to be between 5 and 10 characters",
+          },
+        },
       },
       email: {
         type: DataTypes.STRING,
         unique: true,
       },
-      password: DataTypes.STRING,
+      password: {
+        type: DataTypes.STRING,
+      },
       refreshSecret: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,

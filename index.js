@@ -129,7 +129,7 @@ app.use(
 
 const server = createServer(app);
 
-models.sequelize.sync({}).then(() =>
+models.sequelize.sync({ force: true }).then(() =>
   server.listen(3000, () => {
     new SubscriptionServer(
       {

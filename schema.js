@@ -58,6 +58,17 @@ export default `
     testScore3: Int!
   }
 
+  type Error {
+    path: String!
+    message: String!
+  }
+
+  type RegisterResponse {
+    ok: Boolean!
+    errors: [Error!]
+    user: User
+  }
+
   type Query {
     searchBooks(title: String!): [Book!]!
     getChampion(id: Int!): Champion
@@ -85,7 +96,7 @@ export default `
     deleteUser(username: String!): Int!
     createBoard(owner: Int!, name: String): Board!
     createSuggestion(creatorId: Int!, text: String, boardId: Int!): Suggestion!
-    register(username: String!, email: String!, password: String!, isAdmin: Boolean): User!
+    register(username: String!, email: String!, password: String!, isAdmin: Boolean): RegisterResponse!
     login(email: String!, password: String!): AuthPayload!
     createUser(username: String!): User!
     refreshTokens(token: String!, refreshToken: String!): AuthPayload!
