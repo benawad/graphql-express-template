@@ -49,7 +49,7 @@ export default `
   type Champion {
     id: Int!
     name: String!
-    publicId: String!
+    pictureUrl: String!
   }
 
   type Student {
@@ -69,6 +69,11 @@ export default `
     user: User
   }
 
+  type S3Payload {
+    signedRequest: String!,
+    url: String!,
+  }
+
   type Query {
     searchBooks(title: String!): [Book!]!
     getChampion(id: Int!): Champion
@@ -86,8 +91,9 @@ export default `
   }
 
   type Mutation {
+    signS3(filename: String!, filetype: String!): S3Payload!
+    createChampion(name: String!, pictureUrl: String!): Champion!
     createStudent(testScore1: Int!, testScore2: Int!, testScore3: Int!): Student!
-    createChampion(name: String!, publicId: String!): Champion!
     forgetPassword(userId: Int!, newPassword: String!): Boolean!
     createAuthor(firstname: String!, lastname: String!): Author!
     createBook(title: String!): Book!

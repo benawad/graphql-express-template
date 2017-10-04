@@ -3,7 +3,7 @@ export default (sequelize, DataTypes) => {
     name: {
       type: DataTypes.STRING,
     },
-    publicId: {
+    pictureUrl: {
       type: DataTypes.STRING,
     },
   });

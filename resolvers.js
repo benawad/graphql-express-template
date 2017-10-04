@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import { PubSub } from 'graphql-subscriptions';
 import _ from 'lodash';
 import joinMonster from 'join-monster';
+import aws from 'aws-sdk';
 
 import { requiresAuth, requiresAdmin } from './permissions';
 import { refreshTokens, tryLogin } from './auth';
@@ -9,6 +10,7 @@ import { refreshTokens, tryLogin } from './auth';
 export const pubsub = new PubSub();
 
 const USER_ADDED = 'USER_ADDED';
+const s3Bucket = process.env.S3_BUCKET;
 
 const formatErrors = (e, models) => {
   if (e instanceof models.sequelize.ValidationError) {
@@ -127,6 +129,34 @@ export default {
   },
 
   Mutation: {
+    signS3: async (parent, {
+      filename,
+      filetype,
+    }) => {
+      // AWS_ACCESS_KEY_ID
+      // AWS_SECRET_ACCESS_KEY
+      const s3 = new aws.S3({
+        signatureVersion: 'v4',
+        region: 'us-east-2',
+      });
+
+      const s3Params = {
+        Bucket: s3Bucket,
+        Key: filename,
+        Expires: 60,
+        ContentType: filetype,
+        ACL: 'public-read',
+      };
+
+      const signedRequest = await s3.getSignedUrl('putObject', s3Params);
+      const url = `https://${s3Bucket}.s3.amazonaws.com/${filename}`;
+
+      return {
+        signedRequest,
+        url,
+      };
+    },
+
     createStudent: (parent, args, { models }) => models.Student.create(args),
     createChampion: (parent, args, { models }) => models.Champion.create(args),
     updateUser: (parent, { username, newUsername }, { models }) =>
